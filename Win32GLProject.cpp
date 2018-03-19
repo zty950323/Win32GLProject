@@ -25,6 +25,8 @@ int main(int argc, char **argv)
 //	BoostThreadLearn::mainThreadTest();
 //	BoostThreadLearn::mainThreadInterTest();
 //	BoostThreadLearn::mainThread_synchronizationTest();
+//	BoostThreadLearn::mainThread_lock_grandTest();
+//	BoostThreadLearn::mainThead_unique_lockTest();
 	system("pause");
     return 0;
 }

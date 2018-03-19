@@ -261,11 +261,14 @@ void DDADrawLine::display(void)
 	/* so this could be omitted: */
 
 	
-	DDADrawLine::DDALine(xs, ys, xe, ye);
-	DDADrawLine::DDALine(0, 500, 500, 0);
+//	DDADrawLine::DDALine(xs, ys, xe, ye);
+//	DDADrawLine::DDALine(0, 500, 500, 0);
 //	DDADrawLine::MPDrawLine(50, 80, 400, 160);
 //	DDADrawLine::MPLineDraw(xs, ys, xe, ye);
 //	DDADrawLine::MPLineDraw(0, 500, 500, 0);
+	DDADrawLine::BreasehamDrawLine(xs, ys, xe, ye);
+	DDADrawLine::BreasehamDrawLine(0, 0, 500, 500);
+	DDADrawLine::BreasehamDrawLine(0, 500, 500, 0);
 	/* and flush that buffer to the screen */
 	glFlush();
 }
@@ -285,5 +288,67 @@ void DDADrawLine::myInit(void)
 	glLoadIdentity();
 	gluOrtho2D(0.0, 500.0, 0.0, 500.0);
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void DDADrawLine::Swap(int &a, int &b)
+{
+	int t = a;
+	a = b;
+	b = t;
+}
+
+void DDADrawLine::BreasehamDrawLine(int x0, int y0, int x1, int y1)
+{
+	int iTag = 0;
+	int dx, dy, tx, ty, inc1, inc2, d, curx, cury;
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_POINTS);
+	glVertex2i(x0, y0);
+	glEnd();
+	if (x0 == x1 && y0 == y1)
+	{
+		return;
+	}
+	dy = abs(y1 - y0);
+	dx = abs(x1 - x0);
+	if (dx < dy)
+	{
+		iTag = 1;
+		Swap(x0, x1);
+		Swap(x1, y1);
+		Swap(dx, dy);
+	}
+	tx = ((x1 - x0) > 0) ? 1 : -1;
+	ty = ((y1 - y0) > 0) ? 1 : -1;
+	curx = x0; 
+	cury = y0;
+	inc1 = 2 * dy;
+	inc2 = 2 * (dy - dx);
+	d = inc1 - dx;
+	while (curx != x1)
+	{
+		curx += tx;
+		if (d < 0)
+		{
+			d += inc1;
+		}
+		else
+		{
+			cury += ty;
+			d += inc2;
+		}
+		if (iTag)
+		{
+			glBegin(GL_POINTS);
+			glVertex2i(cury, curx);
+			glEnd();
+		}
+		else
+		{
+			glBegin(GL_POINTS);
+			glVertex2i(curx, cury);
+			glEnd();
+		}
+	}
 }
 

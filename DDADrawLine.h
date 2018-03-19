@@ -57,7 +57,8 @@ public:
 	static void MPLineDraw(int x0, int y0, int x1, int y1);
 	static void display(void);
 	static void myInit(void);
-
+	static void Swap(int &a, int &b);
+	static void BreasehamDrawLine(int x0, int y0, int x1, int y1);
 #if 0
 	// 点数据结构
 	struct Point

@@ -128,10 +128,88 @@ void BoostThreadLearn::mainThread_synchronizationTest(void)
 
 	std::cout << "主线程结束" << std::endl;
 }
+
+
+
 #endif
 
 #if 1
 #if 0
+boost::lock_guard 在其内部构造和析构函数分别自动调用 lock() 和 unlock() 。 访问共享资源是需要同步的，因为它显示地被两个方法调用。
+除了boost::mutex 和 boost::lock_guard 之外，Boost.Thread也提供其他的类支持各种同步。 
+其中一个重要的就是 boost::unique_lock ，相比较 boost::lock_guard 而言，它提供许多有用的方法。
+#endif
+void thread_lock_grard(void)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		BoostThreadLearn::wait(1);
+		boost::lock_guard<boost::mutex> lock(mutex); // 保证了同类线程的运行次序。
+		std::cout << "Thread_lock_grand id:" << boost::this_thread::get_id() << " : " << i << std::endl;
+	}
+}
 
+void BoostThreadLearn::mainThread_lock_grandTest(void)
+{
+	boost::thread t1(thread_lock_grard);
+	boost::thread t2(thread_lock_grard);
+	t1.join();
+	t2.join();
+
+	std::cout << "主线程结束" << std::endl;
+}
+
+
+#if 0
+这个例子就是为了演示 boost::unique_lock 提供的功能。当然了，这些功能的用法对给定的情景不一定适用。
+boost::unique_lock 通过多个构造函数来提供不同的方式获得互斥体。 这个期望获得互斥体的函数简单地调用了 lock() 方法，一直等到获得这个互斥体。 所以它的行为跟 boost::lock_guard 的那个是一样的。
+如果第二个参数传入一个 boost::try_to_lock 类型的值，对应的构造函数就会调用 try_lock() 方法。 
+这个方法返回 bool 型的值：如果能够获得互斥体则返回true，否则返回 false 。
+相比 lock() 函数，try_lock() 会立即返回，而且在获得互斥体之前不会被阻塞。
+程序向 boost::unique_lock 的构造函数的第二个参数传入boost::try_to_lock。 
+然后通过 owns_lock() 可以检查是否可获得互斥体。
+如果不能， owns_lock() 返回 false。 
+这也用到 boost::unique_lock 提供的另外一个函数： timed_lock() 等待一定的时间以获得互斥体。 
+给定的程序等待长达1秒，应较足够的时间来获取更多的互斥。
+其实这个例子显示了三个方法获取一个互斥体：lock() 会一直等待，直到获得一个互斥体。
+try_lock() 则不会等待，但如果它只会在互斥体可用的时候才能获得，否则返回 false 。
+最后，timed_lock() 试图获得在一定的时间内获取互斥体。 和 try_lock() 一样，返回bool 类型的值意味着成功是否。
+虽然 boost::mutex 提供了 lock() 和 try_lock() 两个方法，但是 boost::timed_mutex 只支持 timed_lock() ，这就是上面示例那么使用的原因。
+如果不用 timed_lock() 的话，也可以像以前的例子那样用 boost::mutex。
+就像 boost::lock_guard 一样， boost::unique_lock 的析构函数也会相应地释放互斥量。
+此外，可以手动地用 unlock() 释放互斥量。也可以像上面的例子那样，通过调用 release() 解除boost::unique_lock 和互斥量之间的关联。
+然而在这种情况下，必须显式地调用 unlock() 方法来释放互斥量，因为 boost::unique_lock 的析构函数不再做这件事情。
+boost::unique_lock 这个所谓的独占锁意味着一个互斥量同时只能被一个线程获取。
+其他线程必须等待，直到互斥体再次被释放。 除了独占锁，还有非独占锁。
+Boost.Thread里有个 boost::shared_lock 的类提供了非独占锁。
+正如下面的例子，这个类必须和 boost::shared_mutex 型的互斥量一起使用。
 #endif
+boost::timed_mutex time_mutex;
+void thread_unique_lock(void) 
+{
+	std::cout << "Thread_unique_lock id:" << boost::this_thread::get_id() << std::endl;
+	for (int i = 0; i < 5; i++)
+	{
+		BoostThreadLearn::wait(1);
+		boost::unique_lock<boost::timed_mutex> lock(time_mutex, boost::try_to_lock);
+		if (!lock.owns_lock())
+		{
+			lock.timed_lock(boost::get_system_time() + boost::posix_time::seconds(1));
+			std::cout << "Thread_unique_lock id:" << boost::this_thread::get_id() << ": " << i << std::endl;
+			boost::timed_mutex *m = lock.release();
+			m->unlock();
+		}
+	}
+}
+
+void BoostThreadLearn::mainThead_unique_lockTest(void)
+{
+	boost::thread t1(thread_unique_lock);
+	boost::thread t2(thread_unique_lock);
+	t1.join();
+	t2.join();
+
+	std::cout << "主线程结束" << std::endl;
+}
 #endif
+

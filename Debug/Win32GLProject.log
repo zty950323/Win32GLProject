@@ -16,6 +16,6 @@ d:\opengl\projects\win32glproject\win32glproject\ddadrawline.cpp(100): warning C
 d:\opengl\projects\win32glproject\win32glproject\ddadrawline.cpp(126): warning C4244: “=”: 从“int”转换到“GLfloat”，可能丢失数据
 d:\opengl\projects\win32glproject\win32glproject\ddadrawline.cpp(127): warning C4244: “=”: 从“int”转换到“GLfloat”，可能丢失数据
 d:\opengl\projects\win32glproject\win32glproject\ddadrawline.cpp(149): warning C4068: 未知的杂注
-d:\opengl\projects\win32glproject\win32glproject\ddadrawline.cpp(264): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+d:\opengl\projects\win32glproject\win32glproject\ddadrawline.cpp(269): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
   Win32GLProject.vcxproj -> D:\OpenGL\Projects\Win32GLProject\Debug\Win32GLProject.exe
   Win32GLProject.vcxproj -> D:\OpenGL\Projects\Win32GLProject\Debug\Win32GLProject.pdb (Partial PDB)
